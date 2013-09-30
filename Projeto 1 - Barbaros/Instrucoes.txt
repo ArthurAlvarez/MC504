@@ -10,6 +10,10 @@ Este programa utiliza a biblioteca PyGame
 que pode ser baixada em:
 http://www.pygame.org/
 
+Ou em ambiente Linux, pode ser obtida pelo comando:
+sudo apt-get install python-pygame
+
+
 Para executar o programa, utilize o seguinte comando:
 
 python barbaros.py -b [Numero de barbaros] -p [Numero de refeicoes no pote]
