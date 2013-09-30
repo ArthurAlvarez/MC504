@@ -29,42 +29,10 @@ class Graphics(Thread):
 
         self.size = width, height = 1024, 768
         self.screen = pygame.display.set_mode(self.size, 0, 32)
+        pygame.display.set_mode((1024,768),pygame.FULLSCREEN)
         self.waitTime = 5
 
         self.background = pygame.image.load(self.bgim).convert()
-
-        self.ayla0 = pygame.image.load(self.ayla0).convert_alpha()
-        self.ayla0_rect = self.ayla0.get_rect()
-        self.ayla0 = pygame.transform.scale(self.ayla0, (64, 128))
-        self.ayla0_rect.x = 512
-        self.ayla0_rect.y = 768
-
-        self.kino0 = pygame.image.load(self.kino0).convert_alpha()
-        self.kino0_rect = self.kino0.get_rect()
-        self.kino0 = pygame.transform.scale(self.kino0, (64, 128))
-        self.kino0_rect.x = 512
-        self.kino0_rect.y = 768
-
-        r = random.randrange(0,2)
-        if r == 0:
-            self.barbaro1 = self.ayla0
-        else:
-            self.barbaro1 = self.kino0
-
-        self.barbaro1_rect = self.barbaro1.get_rect()
-        self.barbaro1_rect.x = 512
-        self.barbaro1_rect.y = 768 - 256
-
-        r = random.randrange(0,2)
-        if r == 0:
-            self.barbaro2 = self.ayla0
-        else:
-            self.barbaro2 = self.kino0
-
-        self.barbaro2_rect = self.barbaro2.get_rect()
-        self.barbaro2_rect.x = 512
-        self.barbaro2_rect.y = 768 - 128
-
 
         self.cook0 = pygame.image.load(self.cook0).convert_alpha()
         self.cook0_rect = self.cook0.get_rect()
@@ -84,6 +52,27 @@ class Graphics(Thread):
         self.empty_pot_rect.x = 600
         self.empty_pot_rect.y = 175
 
+        self.ayla0 = pygame.image.load(self.ayla0).convert_alpha()
+        self.ayla0_rect = self.ayla0.get_rect()
+        self.ayla0 = pygame.transform.scale(self.ayla0, (64, 128))
+
+        self.kino0 = pygame.image.load(self.kino0).convert_alpha()
+        self.kino0_rect = self.kino0.get_rect()
+        self.kino0 = pygame.transform.scale(self.kino0, (64, 128))
+
+        global N
+        self.barbaro = []
+        self.barbaro_rect = []
+        for i in range(0,N):
+            r = random.randrange(0,2)
+            if r == 0:
+                self.barbaro.append(self.ayla0)
+            else:
+                self.barbaro.append(self.kino0)
+            self.barbaro_rect.append(self.barbaro[i].get_rect())
+            self.barbaro_rect[i].x = 512
+            self.barbaro_rect[i].y = 768 - 550+i*128
+
         pygame.mouse.set_cursor(*pygame.cursors.broken_x)
         self.potIsFilled = True
         self.font = pygame.font.Font("ArialBlack.ttf", 32)
@@ -96,7 +85,7 @@ class Graphics(Thread):
 
         while True:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
                     os._exit(1)
                     sys.exit()
             self.reconstructScenery(self.potIsFilled)
@@ -109,40 +98,38 @@ class Graphics(Thread):
             self.screen.blit(self.filled_pot, self.filled_pot_rect)
         else:
             self.screen.blit(self.empty_pot, self.empty_pot_rect)
-        self.screen.blit(self.barbaro1, self.barbaro1_rect)
-        self.screen.blit(self.barbaro2, self.barbaro2_rect)
+        for i in range (0, N):
+            self.screen.blit(self.barbaro[i], self.barbaro_rect[i])
         self.screen.blit(self.cook0, self.cook0_rect)
         text = self.font.render("Porcoes: " + str(servings), True, (0, 0, 128))
         self.screen.blit(text, (800 - text.get_width() // 2, 80 - text.get_height() // 2))
+        text = self.font.render("Numero de Barbaros: " + str(N), True, (0, 0, 128))
+        self.screen.blit(text, (800 - text.get_width() // 2, 50 - text.get_height() // 2))
 
     def goToPotAnimation (self):
-        for i in range(0,110):
-            self.barbaro1_rect.y -= 2
-            pygame.time.wait(self.waitTime)
         for i in range(0,70):
-            self.barbaro1_rect.x += 2
-            pygame.time.wait(self.waitTime)
-        for i in range(0,45):
-            self.barbaro1_rect.y -= 2
+            self.barbaro_rect[0].x += 2
             pygame.time.wait(self.waitTime)
 
     def leavePot (self):
-        for i in range(0,300):
-            self.barbaro1_rect.y += 2
+        global N
+        for i in range(0,(N*128)/2):
+            self.barbaro_rect[0].y += 2
+            pygame.time.wait(self.waitTime)
+        for i in range(0,70):
+            self.barbaro_rect[0].x -= 2
             pygame.time.wait(self.waitTime)
             
-        self.barbaro1_rect.x = 512
-        self.barbaro1_rect.y = 768
-        self.barbaro1 = self.barbaro2
-        r = random.randrange(0,2)
-        if r == 0:
-            self.barbaro2 = self.ayla0
-        else:
-            self.barbaro2 = self.kino0
-        self.barbaro1_rect, self.barbaro2_rect = self.barbaro2_rect, self.barbaro1_rect
+        aux = self.barbaro[0]
+        aux_rect = self.barbaro_rect[0]
+        for i in range(0,N-1):
+            self.barbaro[i] = self.barbaro[i+1]
+            self.barbaro_rect[i] = self.barbaro_rect[i+1]
+        self.barbaro[N-1] = aux
+        self.barbaro_rect[N-1] = aux_rect
         for i in range (0, 64):
-            self.barbaro1_rect.y -= 2
-            self.barbaro2_rect.y -= 2
+            for i in range(0,N):
+                self.barbaro_rect[i].y -= 2
             pygame.time.wait(self.waitTime)
 
     def refillPot (self):
@@ -224,13 +211,17 @@ class Cozinheiro(Thread):
     def putServingsInPot(self):
         #Cozinheiro anda ate o pote
         #Fica la um pouco
-        print "(!) Cozinheiro esta botando comida"
+        print "(!) Cozinheiro esta botando comida, agora porcoes =", servings
         Graphics.refillPot(self.graphics)
         time.sleep(2)
         #E volta para sua posicao
 
 
 ## Inicio da execucao do programa
+
+if(len(sys.argv) != 5):
+    print "ERRO: Numero incorreto de parametros (Leia a documentacao)"
+    sys.exit(1)
 
 graphicsAreInitialized = False
 
@@ -240,15 +231,15 @@ emptyPot = Lock()
 fullPot = Lock()
 
 # Criacao de variaveis
-N = 5 # Numero de selvagens na cena
-M = 3 #Numero de refeicoes maximo do pote
+N = int(sys.argv[2]) # Numero de selvagens na cena
+M = int(sys.argv[4]) #Numero de refeicoes maximo do pote
 servings = M #Variavel que representa o pote
 
 # Mutex de emptyPot e fullPot comecam trancados
 emptyPot.acquire()
 fullPot.acquire()
 
-os.system("cls") #limpaTela no windows
+#os.system("cls") #limpaTela no windows
 #os.system("clear") #limpaTela no Linux
 print "** Jantar dos selvagens para", N, "barbaros e", M, "porcoes no pote **"
 print ""
