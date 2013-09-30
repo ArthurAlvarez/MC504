@@ -1,0 +1,11 @@
+MC504 - Projeto 1
+Arthur Alvarez   (RA 116180)
+Pedro Figueiredo (RA 123198)
+----------------------------
+
+Esta animação utiliza a biblioteca PyGame,
+que pode ser obtida em:
+http://www.pygame.org/
+
+Comando para executar o programa no terminal:
+python barbaros.py
