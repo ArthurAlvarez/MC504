@@ -4,6 +4,12 @@ Arthur Alvarez (RA 116180)
 Pedro Figueiredo (RA 123198)
 ---------------------------------------------------------
 
+Sobre o problema:
+O cenário do problema consiste em uma tribo de selvagens famintos, um cozinheiro e um pote com M porções de comida.
+Somente um selvagem pode interagir com o pote de comida por vez e, quando o pote estiver vazio, cabe ao cozinheiro
+ir até o pote e enchê-lo novamente com M porções de comida.
+
+
 Instrucoes:
 
 Este programa utiliza a biblioteca PyGame
