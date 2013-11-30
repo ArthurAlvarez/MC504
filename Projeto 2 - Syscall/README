@@ -1,0 +1,34 @@
+Autores:	Arthur Alvarez 		RA: 116180
+			Pedro Figueiredo	RA: 123198
+
+asmlinkage long sys_timed_stop(const unsigned int n, int pid);
+Essa syscall espera o valor passado no segundo parametro em milisegundos e então para o processo com pid passado no terceiro parametro, de forma similar ao Ctrl+Z.
+
+A syscall deve ser chamada no modo usuário usando syscall(351, tempo_em_ms, pid_do_processo);
+
+Para instalar essa syscall:
+
+1) acrescente a tabela linux-3.12/arch/x86/syscalls/syscall_32.tbl, a linha:
+351 i386	timed_stop			sys_timed_stop
+
+2) inclua a seguinte linha em linux-3.12/include/linux/syscalls.h:
+asmlinkage long sys_timed_stop(const unsigned int n, int pid);
+
+3) copie o arquivo timed_stop.c para o diretório linux-3.12/arch/x86/kernel/
+
+4) inclua a seguinte linha em linux-3.12/arch/x86/kernel/Makefile, logo após a primeira que tem um ":=":
+obj-y			+= timed_stop.o
+
+5) execute um make no diretório linux-3.12
+
+6) copie "teste" para o diretório com o arquivo mc504.img.
+
+7) execute nesse mesmo diretório qemu-system-x86_64 -hda mc504.img -kernel linux-3.12/arch/i386/boot/bzImage -append "ro root=/dev/hda" -hdb teste
+
+8) após logar, execute:
+$ cat /dev/hdb > teste
+$ chmod +x teste
+$ ./teste
+
+"teste" testa a syscall mandando como parametro 5000 ms, e o próprio pid.
+Ele entra em um loop infinito logo depois. Após 5 segundos, a syscall forçara esse programa ser parado, com efeito similar ao Ctrl+Z
